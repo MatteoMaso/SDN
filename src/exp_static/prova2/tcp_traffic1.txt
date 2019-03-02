@@ -1,0 +1,15 @@
+------------------------------------------------------------
+Server listening on TCP port 5001
+TCP window size: 85.3 KByte (default)
+------------------------------------------------------------
+[  4] local 192.168.1.1 port 5001 connected with 192.168.1.3 port 34616
+[ ID] Interval       Transfer     Bandwidth
+[  4]  0.0-10.0 sec   624 KBytes   511 Kbits/sec
+[  4] 10.0-20.0 sec   628 KBytes   514 Kbits/sec
+[  4] 20.0-30.0 sec   551 KBytes   452 Kbits/sec
+[  4] 30.0-40.0 sec   738 KBytes   605 Kbits/sec
+[  4] 40.0-50.0 sec   631 KBytes   517 Kbits/sec
+[  4] 50.0-60.0 sec   925 KBytes   758 Kbits/sec
+[  4] 60.0-70.0 sec   863 KBytes   707 Kbits/sec
+[  4] 70.0-80.0 sec   498 KBytes   408 Kbits/sec
+[  4]  0.0-84.8 sec  5.88 MBytes   581 Kbits/sec

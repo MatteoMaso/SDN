@@ -1,0 +1,84 @@
+Simulazione pratica SDN
+
+parto dal sito http://mininet.org/ di mininet = simulatore di rete host + controller + switch
+
+	- scarico macchina virtuale
+	- installo ubuntu 16.04 LTS
+	- installo mininet tramite il tutorial sul sito
+
+procedo col link in cui ci sono i comandi base http://mininet.org/walkthrough/ 
+
+	COMANDI BASE MININET
+
+	* sudo mn   = fa partire mininet
+	* sudo mn -c = pulisce la sessione precedente di mininet
+
+	* per far fare un comando ad un determinato host fare mininete> h1 ping -c 2 h2 oppure h1 ifconfig	
+
+	exit    = esce
+	nodes   = mostra i dispositivi
+	net     = mostra i link
+	dump    = informazioni su tutti i nodi 
+	xterm h1 = lancia un terminale per l'host h1 
+	iperf   = testa le prestazioni della rete
+	link s1 h1 up/down = serve per attivare o disattivare un determinato collegamento
+
+ora ci sarebbe l'opzione per collegare un controller remoto/esterno, ma per ora non serve
+
+proseguo col tutorial su OpenFlow  https://github.com/mininet/openflow-tutorial/wiki
+	poi passo ad installar i software specifici https://github.com/mininet/openflow-tutorial/wiki/Learn-Development-Tools
+
+    * view flow tables with dpctl
+    * dissect OpenFlow message with Wireshark
+    * simulate a multi-switch, multi-host network with Mininet
+    * benchmark your controller with cbench
+(questi sono da approfondire)
+
+
+1° tutorial 
+
+	sudo mn --topo single,3 --mac --switch ovsk --controller remote
+		
+    		Created 3 virtual hosts, each with a separate IP address.
+    		Created a single OpenFlow software switch in the kernel with 3 ports.
+    		Connected each virtual host to the switch with a virtual ethernet cable.
+    		Set the MAC address of each host equal to its IP.
+    		Configure the OpenFlow switch to connect to a remote controller.
+
+	se ora ping non funziona perchè devo inizializzare la tabella di flusso a mano tramite 
+		ovs-ofctl add-flow s1 in_port=1,actions=output:2
+		ovs-ofctl add-flow s1 in_port=2,actions=output:1
+
+	una volta aggiunti i flussi nella tabella funziona il ping, 
+	sudo ovs-ofctl dump-flows s1
+		mostra la tabella di flussi nel controller che inizialmente sarebbe vuota
+
+	passo successivo è avviare il controller ptcp: tramite il comando 
+	$ sudo controller ptcp:
+		ci mette un po ad avviarsi ma poi parte
+
+	ora vedo che i flussi tra gli host li riconosce il controller e tutto funziona, posso analizzare lo scambio di richieste tramite wireshark impostando opportunamente i filtri 
+
+2° create a learning switch con POX https://github.com/mininet/openflow-tutorial/wiki/Create-a-Learning-Switch
+
+http://flowgrammable.org/sdn/openflow/message-layer/ dare un occhio a questo link = protocollo comunicazione openflow
+
+	$ sudo killall controller
+	 mininet> exit
+ 	$ sudo mn -c
+ 	$ sudo mn --topo single,3 --mac --switch ovsk --controller remote
+	$./pox.py log.level --DEBUG misc.of_tutorial
+
+		INFO:openflow.of_01:[Con 1/1] Connected to 00-00-00-00-00-01
+ 		DEBUG:misc.of_tutorial:Controlling [00-00-00-00-00-01 1]
+		(se esce che è connesso ok ) 
+	
+	mininet> xterm h1 h2 h3		
+	# tcpdump -XX -n -i h2-eth0 e anche sul 3
+	# ping -c1 10.0.0.2 
+	
+		( e vediamo come girano i pacchetti tra l'host 2 e 3 con ARP request ed echo, vediamo che la prima 
+		volta fanno un ARP, la seconda volta mandano direttamente il pacchetto ICMP 
+
+
+
